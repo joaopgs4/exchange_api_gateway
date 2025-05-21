@@ -4,12 +4,11 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from middleware import *
-from database import get_db
 from typing import Optional
 
 router = APIRouter(
-    prefix="",
-    tags=[""]
+    prefix="/route",
+    tags=["route"]
 )
 
 ###################################
@@ -27,7 +26,6 @@ async def root_func():
 @router.get("/debug/token")
 async def token_debug(
     request: Request,
-    db: Session = Depends(get_db),
     cookie: AuthToken = Depends(get_cookie_as_model)  # Decoded cookie (JWT payload)
 ):
     try:

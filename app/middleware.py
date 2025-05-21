@@ -3,7 +3,7 @@
 #session token and extracting its info for use in the routes functions
 from fastapi import Request, HTTPException
 from datetime import datetime, timedelta
-from models import AuthToken
+from schemas import AuthToken
 from typing import Dict
 import jwt
 import os
