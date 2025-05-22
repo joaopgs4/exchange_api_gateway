@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr
 
 #Base JWT AuthToken model
 class AuthToken(BaseModel):
-    user_id : int
+    id : int
     username : str
     email : str
     role : Optional[str] = None

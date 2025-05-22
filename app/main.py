@@ -25,18 +25,16 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Microservice is up!"}
+    return {"message": "Gateway microservice is up!"}
 
 @app.post("/register", response_model=UserReadDTO, status_code=201)
 async def register_gateway(payload: UserCreateDTO):
     try:
         user = requests.post(URL_ACCOUNT_SERVICE + "/account/register", json=payload.dict())
-        if not user:
-            raise HTTPException(400, detail="Erro ao realizar request de register no gateway")
         if user.status_code != 201:
             raise HTTPException(status_code=user.status_code, detail=user.json().get("detail"))
         user = user.json()
-        return UserReadDTO(id=user.id, username=user.username, email=user.email)
+        return UserReadDTO(id=user["id"], username=user["username"], email=user["email"])
 
     except HTTPException as e:
         raise e
@@ -47,8 +45,6 @@ async def register_gateway(payload: UserCreateDTO):
 async def login_gateway(payload: UserLoginDTO):
     try:
         response = requests.post(URL_AUTH_SERVICE + "/auth/login", json=payload.dict())
-        if not response:
-            raise HTTPException(400, detail="Erro ao realizar request de login no gateway")
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
         
@@ -76,16 +72,12 @@ async def login_gateway(payload: UserLoginDTO):
 async def exchange_gateway(currency1: str, currency2: str, request: Request):
     try:
         session_token = request.cookies.get("session_token")
-        if not session_token:
-            raise HTTPException(status_code=401, detail="Token de sessão não esta presente no gateway")
         headers = {
             "Authorization": f"Bearer {session_token}"
         }
         
         response = requests.get(URL_EXCHANGE_SERVICE + f"/exchange/{currency1}/{currency2}", 
                                 headers=headers)
-        if not response:
-            raise HTTPException(400, detail="Erro ao realizar request de exchange no gateway")
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
         
