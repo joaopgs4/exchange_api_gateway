@@ -1,6 +1,6 @@
 # schemas.py
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 #########################################################################
 ##### Uses pydantic for cache/dynamic objects; not referenced in DB #####
@@ -17,3 +17,17 @@ class AuthToken(BaseModel):
     # Allow any additional fields
     class Config:
         extra = "allow"
+
+class UserCreateDTO(BaseModel):
+    username : str
+    email : EmailStr
+    password : str
+
+class UserReadDTO(BaseModel):
+    id : int
+    username : str
+    email : EmailStr
+
+class UserLoginDTO(BaseModel):
+    email : EmailStr
+    password : str
