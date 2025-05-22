@@ -7,12 +7,13 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from middleware import *
 from schemas import *
-from typing import Optional
+from typing import Optional, List
 import requests
 
 URL_ACCOUNT_SERVICE = os.getenv("URL_ACCOUNT_SERVICE")
 URL_AUTH_SERVICE = os.getenv("URL_AUTH_SERVICE")
 URL_EXCHANGE_SERVICE = os.getenv("URL_EXCHANGE_SERVICE")
+URL_PRODUCT_SERVICE = os.getenv("URL_PRODUCT_SERVICE")
 
 app = FastAPI()
 app.add_middleware(
@@ -83,6 +84,81 @@ async def exchange_gateway(currency1: str, currency2: str, request: Request):
         
         return response.json()
 
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/product", response_model=ProductReadDTO, status_code=201)
+async def create_product_gateway(payload: ProductCreateDTO, request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.post(URL_PRODUCT_SERVICE + "/product", json=payload.dict(), headers=headers)
+
+        if response.status_code != 201:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/product", response_model=List[ProductReadDTO], status_code=200)
+async def get_all_products_gateway(request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.get(URL_PRODUCT_SERVICE + "/product", headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/product/{id}", response_model=ProductReadDTO, status_code=200)
+async def get_product_by_id_gateway(id: int, request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.get(URL_PRODUCT_SERVICE + f"/product/{id}", headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/product/{id}", response_model=ProductReadDTO, status_code=200)
+async def delete_product_gateway(id: int, request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.delete(URL_PRODUCT_SERVICE + f"/product/{id}", headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
 
     except HTTPException as e:
         raise e

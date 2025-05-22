@@ -31,3 +31,25 @@ class UserReadDTO(BaseModel):
 class UserLoginDTO(BaseModel):
     email : EmailStr
     password : str
+
+class AuthToken(BaseModel):
+    id : int
+    username : str
+    email : str
+    role : Optional[str] = None
+    exp : Optional[int] = None  # Optional expiry (timestamp) for the JWT
+
+    # Allow any additional fields
+    class Config:
+        extra = "allow"
+
+class ProductCreateDTO(BaseModel):
+    name : str
+    price : float
+    unit : str
+
+class ProductReadDTO(BaseModel):
+    id : int
+    name : str
+    price : float
+    unit : str
