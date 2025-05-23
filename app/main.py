@@ -14,6 +14,7 @@ URL_ACCOUNT_SERVICE = os.getenv("URL_ACCOUNT_SERVICE")
 URL_AUTH_SERVICE = os.getenv("URL_AUTH_SERVICE")
 URL_EXCHANGE_SERVICE = os.getenv("URL_EXCHANGE_SERVICE")
 URL_PRODUCT_SERVICE = os.getenv("URL_PRODUCT_SERVICE")
+URL_ORDER_SERVICE = os.getenv("URL_ORDER_SERVICE")
 
 app = FastAPI()
 app.add_middleware(
@@ -154,6 +155,73 @@ async def delete_product_gateway(id: int, request: Request):
         headers = {"Authorization": f"Bearer {session_token}"}
 
         response = requests.delete(URL_PRODUCT_SERVICE + f"/product/{id}", headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/order", response_model=OrderReadDTO, status_code=201)
+async def create_order_gateway(payload: OrderCreateDTO, request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.post(
+            URL_ORDER_SERVICE + "/order",
+            json=payload.dict(),
+            headers=headers
+        )
+
+        if response.status_code != 201:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/order", response_model=List[OrderShortReadDTO], status_code=200)
+async def get_all_orders_gateway(request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.get(
+            URL_ORDER_SERVICE + "/order",
+            headers=headers
+        )
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+
+        return response.json()
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/order/{id}", response_model=OrderReadDTO, status_code=200)
+async def get_order_by_id_gateway(id: int, request: Request):
+    try:
+        session_token = request.cookies.get("session_token")
+        headers = {"Authorization": f"Bearer {session_token}"}
+
+        response = requests.get(
+            URL_ORDER_SERVICE + f"/order/{id}",
+            headers=headers
+        )
 
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
