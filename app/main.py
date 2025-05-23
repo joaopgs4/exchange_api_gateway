@@ -70,7 +70,7 @@ async def login_gateway(payload: UserLoginDTO):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@app.get("/{currency1}/{currency2}", status_code=200)
+@app.get("/exchange/{currency1}/{currency2}", status_code=200)
 async def exchange_gateway(currency1: str, currency2: str, request: Request):
     try:
         session_token = request.cookies.get("session_token")
