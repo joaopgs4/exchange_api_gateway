@@ -9,65 +9,63 @@ from pydantic import BaseModel, EmailStr
 
 #Base JWT AuthToken model
 class AuthToken(BaseModel):
-    id : int
-    username : str
-    email : str
-    role : Optional[str] = None
-    exp : Optional[int] = None  # Optional expiry (timestamp) for the JWT
+    uuid: str
+    username: str
+    email: EmailStr
+    role: Optional[str] = None
+    exp: Optional[int] = None  # Optional expiry (timestamp) for the JWT
 
-    # Allow any additional fields
     class Config:
         extra = "allow"
 
 class UserCreateDTO(BaseModel):
-    username : str
-    email : EmailStr
-    password : str
+    username: str
+    email: EmailStr
+    password: str
 
 class UserReadDTO(BaseModel):
-    id : int
-    username : str
-    email : EmailStr
+    uuid: str
+    username: str
+    email: EmailStr
 
 class UserLoginDTO(BaseModel):
-    email : EmailStr
-    password : str
+    email: EmailStr
+    password: str
 
 class ProductCreateDTO(BaseModel):
-    name : str
-    price : float
-    unit : str
+    name: str
+    price: float
+    unit: str
 
 class ProductReadDTO(BaseModel):
-    id : int
-    name : str
-    price : float
-    unit : str
+    product_uuid: str
+    name: str
+    price: float
+    unit: str
 
 class ProductInOrder(BaseModel):
-    id : int
-    quantity : int
+    product_uuid: str
+    quantity: int
 
 class OrderCreateDTO(BaseModel):
-    items : List[ProductInOrder]
+    items: List[ProductInOrder]
 
 class OrderShortReadDTO(BaseModel):
-    id : int
-    date : datetime
-    total : float
+    uuid: str
+    date: datetime
+    total: float
 
 class ProductId(BaseModel):
-    id : int
+    product_uuid: str
 
 class ProductFull(BaseModel):
-    id : int
-    product : ProductId
-    quantity : int
-    total : float
-
+    uuid: str
+    product: ProductId
+    quantity: int
+    total: float
 
 class OrderReadDTO(BaseModel):
-    id : int
-    date : datetime
-    items : List[ProductFull]
-    total : float
+    uuid: str
+    date: datetime
+    items: List[ProductFull]
+    total: float

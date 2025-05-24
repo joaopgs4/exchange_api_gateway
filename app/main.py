@@ -32,11 +32,16 @@ def read_root():
 @app.post("/register", response_model=UserReadDTO, status_code=201)
 async def register_gateway(payload: UserCreateDTO):
     try:
-        user = requests.post(URL_ACCOUNT_SERVICE + "/account/register", json=payload.dict())
-        if user.status_code != 201:
-            raise HTTPException(status_code=user.status_code, detail=user.json().get("detail"))
-        user = user.json()
-        return UserReadDTO(id=user["id"], username=user["username"], email=user["email"])
+        response = requests.post(URL_ACCOUNT_SERVICE + "/account/register", json=payload.dict())
+        if response.status_code != 201:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
+        
+        user = response.json()
+        return UserReadDTO(
+            uuid=user["uuid"], 
+            username=user["username"], 
+            email=user["email"]
+        )
 
     except HTTPException as e:
         raise e
@@ -47,15 +52,17 @@ async def register_gateway(payload: UserCreateDTO):
 async def login_gateway(payload: UserLoginDTO):
     try:
         response = requests.post(URL_AUTH_SERVICE + "/auth/login", json=payload.dict())
+
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
-        
+
         session_token = response.cookies.get("session_token")
         if not session_token:
-            raise HTTPException(500, detail="Token se sessão não encontrado no login do gateway")
+            raise HTTPException(status_code=500, detail="Session token not found in login response")
 
-        json_data = response.json()
-        client_response = JSONResponse(content=json_data)
+        user = response.json()
+
+        client_response = JSONResponse(content=user)
         client_response.set_cookie(
             key="session_token",
             value=session_token,
