@@ -186,6 +186,10 @@ async def delete_product_gateway(uuid: str, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+# Function for creating an order through the gateway
+# Input: OrderCreateDTO, request (cookie token)
+# Output: OrderReadDTO
 @app.post("/order", response_model=OrderReadDTO, status_code=201)
 async def create_order_gateway(payload: OrderCreateDTO, request: Request):
     try:
@@ -209,6 +213,9 @@ async def create_order_gateway(payload: OrderCreateDTO, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Function for getting all orders through the gateway
+# Input: request (cookie token)
+# Output: List[OrderShortReadDTO]
 @app.get("/order", response_model=List[OrderShortReadDTO], status_code=200)
 async def get_all_orders_gateway(request: Request):
     try:
@@ -231,14 +238,17 @@ async def get_all_orders_gateway(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/order/{id}", response_model=OrderReadDTO, status_code=200)
-async def get_order_by_id_gateway(id: int, request: Request):
+# Function for getting a single order by UUID through the gateway
+# Input: uuid, request (cookie token)
+# Output: OrderReadDTO
+@app.get("/order/{uuid}", response_model=OrderReadDTO, status_code=200)
+async def get_order_by_id_gateway(uuid: str, request: Request):
     try:
         session_token = request.cookies.get("session_token")
         headers = {"Authorization": f"Bearer {session_token}"}
 
         response = requests.get(
-            URL_ORDER_SERVICE + f"/order/{id}",
+            URL_ORDER_SERVICE + f"/order/{uuid}",
             headers=headers
         )
 
