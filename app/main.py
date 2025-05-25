@@ -98,6 +98,9 @@ async def exchange_gateway(currency1: str, currency2: str, request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+# Function for creating a product through the gateway
+# Input: ProductCreateDTO, request (cookie token)
+# Output: ProductReadDTO
 @app.post("/product", response_model=ProductReadDTO, status_code=201)
 async def create_product_gateway(payload: ProductCreateDTO, request: Request):
     try:
@@ -117,6 +120,9 @@ async def create_product_gateway(payload: ProductCreateDTO, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Function for getting all products through the gateway
+# Input: request (cookie token)
+# Output: List[ProductReadDTO]
 @app.get("/product", response_model=List[ProductReadDTO], status_code=200)
 async def get_all_products_gateway(request: Request):
     try:
@@ -136,13 +142,16 @@ async def get_all_products_gateway(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/product/{id}", response_model=ProductReadDTO, status_code=200)
-async def get_product_by_id_gateway(id: int, request: Request):
+# Function for getting a product by UUID through the gateway
+# Input: uuid, request (cookie token)
+# Output: ProductReadDTO
+@app.get("/product/{uuid}", response_model=ProductReadDTO, status_code=200)
+async def get_product_by_id_gateway(uuid: str, request: Request):
     try:
         session_token = request.cookies.get("session_token")
         headers = {"Authorization": f"Bearer {session_token}"}
 
-        response = requests.get(URL_PRODUCT_SERVICE + f"/product/{id}", headers=headers)
+        response = requests.get(URL_PRODUCT_SERVICE + f"/product/{uuid}", headers=headers)
 
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
@@ -155,13 +164,16 @@ async def get_product_by_id_gateway(id: int, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/product/{id}", response_model=ProductReadDTO, status_code=200)
-async def delete_product_gateway(id: int, request: Request):
+# Function for deleting a product by UUID through the gateway
+# Input: uuid, request (cookie token)
+# Output: ProductReadDTO
+@app.delete("/product/{uuid}", response_model=ProductReadDTO, status_code=200)
+async def delete_product_gateway(uuid: str, request: Request):
     try:
         session_token = request.cookies.get("session_token")
         headers = {"Authorization": f"Bearer {session_token}"}
 
-        response = requests.delete(URL_PRODUCT_SERVICE + f"/product/{id}", headers=headers)
+        response = requests.delete(URL_PRODUCT_SERVICE + f"/product/{uuid}", headers=headers)
 
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
